@@ -1,0 +1,19 @@
+# Jetons optionnels : le relais fonctionne sans eux (repli documenté dans la graine).
+# Renseigner `expire_le` (AAAA-MM-JJ) à la création de chaque jeton : la graine lève une alerte à J-30.
+# Les valeurs des jetons vivent dans les secrets GitHub, jamais dans ce fichier.
+jetons:
+  - nom: ANTHROPIC_API_KEY
+    usage: "Notes Bercy / Social du Tour 1 (sinon gabarits déterministes)"
+    expire_le: null
+  - nom: FT_CLIENT_ID
+    usage: "Offres d'emploi temps réel, API France Travail (sinon Indeed, non officiel)"
+    expire_le: null
+  - nom: WEBSTAT_API_KEY
+    usage: "TEC 10 ans quotidien et balance des voyages, Banque de France"
+    expire_le: null
+  - nom: AGSI_API_KEY
+    usage: "Stocks de gaz Storengy et de GNL, Gas Infrastructure Europe (AGSI+ / ALSI)"
+    expire_le: null
+  - nom: RTE_CLIENT_ID
+    usage: "Stock hydraulique hebdomadaire, API RTE"
+    expire_le: null

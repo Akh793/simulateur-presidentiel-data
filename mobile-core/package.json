@@ -1,0 +1,27 @@
+{
+  "name": "@simpres/mobile-core",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Persistance locale SQLite (expo-sqlite) et moteur narratif hors ligne du Simulateur Présidentiel Français",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "ci": "npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "expo-sqlite": ">=15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-sqlite": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

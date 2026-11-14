@@ -1,0 +1,136 @@
+name: Graine du jour
+
+# Lot principal à 09h15 heure de Paris (après les publications INSEE de 08h45) et tâche horaire légère.
+# Les crons GitHub sont en UTC : deux crons couvrent l'heure d'hiver et l'heure d'été, une garde en
+# Europe/Paris décide du mode. GitHub peut retarder (voire sauter) un passage planifié en période de
+# charge : la graine porte son horodatage ; l'application signale une graine de plus de 36 heures
+# (elle reste jouable : la refuser renverrait vers les archives embarquées, encore plus anciennes).
+on:
+  schedule:
+    - cron: "15 7 * * *"    # 09h15 Paris en heure d'été (UTC+2)
+    - cron: "15 8 * * *"    # 09h15 Paris en heure d'hiver (UTC+1)
+    - cron: "7 * * * *"     # tâche horaire, minute 7 pour éviter le pic de l'heure pile
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Mode du relais"
+        type: choice
+        options: [quotidien, horaire]
+        default: quotidien
+
+permissions:
+  contents: write   # pousser la branche data (état, archives, graines datées)
+  pages: write
+  id-token: write
+
+concurrency:
+  group: graine-du-jour
+  cancel-in-progress: false
+
+jobs:
+  graine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Récupérer la branche data (état persistant)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads origin data >/dev/null 2>&1; then
+            git clone --quiet --depth 1 --branch data "$REMOTE" data
+          else
+            mkdir -p data && git -C data init -q -b data && git -C data remote add origin "$REMOTE"
+          fi
+          git -C data config user.name "relais-graine[bot]"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: Choisir le mode (garde Europe/Paris)
+        id: mode
+        env:
+          TZ: Europe/Paris
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime as dt, json, os, pathlib
+          now = dt.datetime.now()
+          if os.environ["EVENT"] == "workflow_dispatch":
+              print(f"mode={os.environ['INPUT_MODE'] or 'quotidien'}"); raise SystemExit
+          # marqueur écrit par build_seed.py après un lot quotidien réussi (heure de Paris)
+          marque = pathlib.Path("data/lots") / f"{now.date().isoformat()}.txt"
+          lot_fait = marque.exists() and int(marque.read_text()[11:13] or 0) >= 9
+          if os.environ["SCHEDULE"] in ("15 7 * * *", "15 8 * * *"):
+              # seul le cron qui tombe à 09h (ou en retard après 09h) lance le lot, une fois par jour
+              print("mode=quotidien" if now.hour >= 9 and not lot_fait else "mode=aucun")
+          else:
+              print("mode=horaire")
+          PY
+
+      - name: Construire la graine
+        id: build
+        if: steps.mode.outputs.mode != 'aucun'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SEED_LLM_MODEL: ${{ vars.SEED_LLM_MODEL }}
+          FT_CLIENT_ID: ${{ secrets.FT_CLIENT_ID }}
+          FT_CLIENT_SECRET: ${{ secrets.FT_CLIENT_SECRET }}
+          WEBSTAT_API_KEY: ${{ secrets.WEBSTAT_API_KEY }}
+          AGSI_API_KEY: ${{ secrets.AGSI_API_KEY }}
+          RTE_CLIENT_ID: ${{ secrets.RTE_CLIENT_ID }}
+        run: |
+          set +e
+          python3 -I -u pipeline/build_seed.py --mode "${{ steps.mode.outputs.mode }}" --data data --out site
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          # 0 = graine valide ; 2 = graine publiée mais majorité des sources de pilotage mortes ; 1 = graine invalide
+          [ "$rc" -eq 1 ] && exit 1 || exit 0
+
+      - name: Publier la graine sur la branche data (URL raw.githubusercontent.com lue par l'application)
+        if: steps.mode.outputs.mode != 'aucun' && steps.build.outputs.rc != '1'
+        run: |
+          mkdir -p data/public
+          cp site/graine_du_jour.json site/graine_du_jour.json.sha256 data/public/
+
+      - name: Sauvegarder l'état sur la branche data
+        if: steps.mode.outputs.mode != 'aucun'
+        run: |
+          cd data
+          git add -A
+          if git diff --cached --quiet; then echo "rien à sauvegarder"; exit 0; fi
+          git commit -q -m "relais ${{ steps.mode.outputs.mode }} $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git push -q origin data && exit 0
+            git pull -q --rebase origin data || true
+            sleep $((i * 5))
+          done
+          exit 1
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.mode.outputs.mode != 'aucun'
+        with:
+          path: site
+
+      - id: deploy
+        if: steps.mode.outputs.mode != 'aucun'
+        uses: actions/deploy-pages@v4
+
+      - name: Signaler une graine dégradée
+        if: steps.build.outputs.rc == '2'
+        run: |
+          echo "::error::Plus de la moitié des indicateurs de pilotage sont morts : voir site/sources_health.json"
+          exit 1

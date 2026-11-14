@@ -1,0 +1,37 @@
+# Valeurs de référence sourcées (règle d'ingestion n° 8) et paramètres de calcul du relais.
+# Chaque valeur porte sa source ; « a_confirmer » = valeur publique mais à revérifier avant mise en production.
+
+sae_passages_urgences_annuels:
+  valeur: 21300000
+  reference: "2024"
+  source: "DREES, Les établissements de santé en 2024, édition 2026 (SAE)"
+  url: "https://drees.solidarites-sante.gouv.fr/publications-communique-de-presse-documents-de-reference/panoramas-de-la-drees/260520-Etablissements-de-sant%C3%A9-en-2024"
+
+substitutions:
+  - id: SUB_PETROLE
+    libelle: "Stocks stratégiques pétroliers (référence légale)"
+    valeur: 14.5
+    unite: "Mt"
+    reference: "2026"
+    source_libelle: "UFIP Énergies et Mobilités, L'approvisionnement de la France en énergies liquides 2026"
+    source_url: "https://www.energiesetmobilites.fr/uploads/pdf/PRES_2026_Appro_de_la_France_en_%C3%A9nergies_liquides_DEF.pdf"
+    statut: verifie
+    note: "Environ 3 mois de consommation. Ne varie que sur décision du joueur (déblocage coordonné AIE)."
+  - id: SUB_HEBERGEMENT
+    libelle: "Places d'hébergement généraliste (base du modèle 115)"
+    valeur: 218200
+    unite: "places"
+    reference: "début 2021"
+    source_libelle: "DREES, Les Dossiers de la DREES n° 113, octobre 2023 (enquête ES-DS)"
+    source_url: "https://www.drees.solidarites-sante.gouv.fr/sites/default/files/2023-10/DD113_2.pdf"
+    statut: a_confirmer
+    note: "Périmètre DREES différent de celui de la DIHAL ; valeur de 2021 à remplacer par l'extraction FINESS. Demande 115 = places x alertes météo (grand froid, canicule)."
+  - id: SUB_ACOSS_PLAFOND
+    libelle: "Plafond d'emprunt de l'Acoss pour 2026"
+    valeur: 83000000000
+    unite: "€"
+    reference: "2026"
+    source_libelle: "Assemblée nationale, commission des finances, compte rendu n° 18 de la session 2025-2026 (PLFSS 2026)"
+    source_url: "https://www.assemblee-nationale.fr/dyn/17/comptes-rendus/cion_fin/l17cion_fin2526018_compte-rendu.pdf"
+    statut: a_confirmer
+    note: "Montant annoncé au PLFSS 2026 ; à vérifier sur la LFSS promulguée. Trésorerie Acoss = masse salariale Urssaf face à ce plafond."

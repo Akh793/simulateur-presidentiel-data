@@ -1,0 +1,21 @@
+{
+  "name": "@simpres/engine",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Moteur de simulation du Simulateur Présidentiel Français (pur TypeScript, sans I/O)",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "ci": "npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

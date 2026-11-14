@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist-android/
+dist-ios/
+expo-env.d.ts
+*.tsbuildinfo
+dist-web/
+/ios
+/android

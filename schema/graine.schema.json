@@ -1,0 +1,1188 @@
+{
+ "additionalProperties": false,
+ "properties": {
+  "schema_version": {
+   "const": "1.0.0",
+   "title": "Schema Version",
+   "type": "string"
+  },
+  "meta": {
+   "$ref": "#/$defs/Meta"
+  },
+  "sources_health": {
+   "items": {
+    "$ref": "#/$defs/SanteSource"
+   },
+   "title": "Sources Health",
+   "type": "array"
+  },
+  "jetons": {
+   "items": {
+    "$ref": "#/$defs/Jeton"
+   },
+   "title": "Jetons",
+   "type": "array"
+  },
+  "pilotage": {
+   "items": {
+    "$ref": "#/$defs/IndicateurPilotage"
+   },
+   "title": "Pilotage",
+   "type": "array"
+  },
+  "bilan": {
+   "items": {
+    "$ref": "#/$defs/IndicateurBilan"
+   },
+   "title": "Bilan",
+   "type": "array"
+  },
+  "parlement": {
+   "$ref": "#/$defs/Parlement"
+  },
+  "substitutions": {
+   "items": {
+    "$ref": "#/$defs/Substitution"
+   },
+   "title": "Substitutions",
+   "type": "array"
+  },
+  "tour1": {
+   "$ref": "#/$defs/Tour1"
+  }
+ },
+ "required": [
+  "schema_version",
+  "meta",
+  "sources_health",
+  "jetons",
+  "pilotage",
+  "bilan",
+  "parlement",
+  "substitutions",
+  "tour1"
+ ],
+ "title": "Graine",
+ "type": "object",
+ "$defs": {
+  "Anomalie": {
+   "additionalProperties": false,
+   "properties": {
+    "methode": {
+     "enum": [
+      "mad_robuste",
+      "seuil_direct",
+      "historique_insuffisant"
+     ],
+     "title": "Methode",
+     "type": "string"
+    },
+    "score": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "z robuste (médiane/MAD) ou niveau direct normalisé",
+     "title": "Score"
+    },
+    "seuil": {
+     "title": "Seuil",
+     "type": "number"
+    },
+    "depasse": {
+     "title": "Depasse",
+     "type": "boolean"
+    },
+    "sens": {
+     "enum": [
+      "hausse",
+      "baisse",
+      "neutre"
+     ],
+     "title": "Sens",
+     "type": "string"
+    },
+    "fenetre": {
+     "description": "Nombre d'observations de la fenêtre de référence",
+     "title": "Fenetre",
+     "type": "integer"
+    },
+    "gravite": {
+     "maximum": 5,
+     "minimum": 0,
+     "title": "Gravite",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "methode",
+    "score",
+    "seuil",
+    "depasse",
+    "sens",
+    "fenetre",
+    "gravite"
+   ],
+   "title": "Anomalie",
+   "type": "object"
+  },
+  "Chambre": {
+   "additionalProperties": false,
+   "properties": {
+    "code": {
+     "enum": [
+      "AN",
+      "SENAT"
+     ],
+     "title": "Code",
+     "type": "string"
+    },
+    "legislature": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Legislature"
+    },
+    "sieges_total": {
+     "title": "Sieges Total",
+     "type": "integer"
+    },
+    "sieges_pourvus": {
+     "title": "Sieges Pourvus",
+     "type": "integer"
+    },
+    "majorite_absolue": {
+     "description": "floor(sièges pourvus / 2) + 1",
+     "title": "Majorite Absolue",
+     "type": "integer"
+    },
+    "seuil_censure": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "AN seulement : majorité des membres composant l'Assemblée",
+     "title": "Seuil Censure"
+    },
+    "groupes": {
+     "items": {
+      "$ref": "#/$defs/Groupe"
+     },
+     "title": "Groupes",
+     "type": "array"
+    },
+    "scrutins_7j": {
+     "title": "Scrutins 7J",
+     "type": "integer"
+    },
+    "maj_source": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "Last-Modified du fichier source",
+     "title": "Maj Source"
+    }
+   },
+   "required": [
+    "code",
+    "legislature",
+    "sieges_total",
+    "sieges_pourvus",
+    "majorite_absolue",
+    "seuil_censure",
+    "groupes",
+    "scrutins_7j",
+    "maj_source"
+   ],
+   "title": "Chambre",
+   "type": "object"
+  },
+  "Couverture": {
+   "additionalProperties": false,
+   "properties": {
+    "pilotage_cablees": {
+     "title": "Pilotage Cablees",
+     "type": "integer"
+    },
+    "bilan_cablees": {
+     "title": "Bilan Cablees",
+     "type": "integer"
+    },
+    "cible_sous_categories": {
+     "title": "Cible Sous Categories",
+     "type": "integer"
+    },
+    "manquantes": {
+     "description": "Indicateurs prévus mais non câblés, avec la raison",
+     "items": {
+      "type": "string"
+     },
+     "title": "Manquantes",
+     "type": "array"
+    }
+   },
+   "required": [
+    "pilotage_cablees",
+    "bilan_cablees",
+    "cible_sous_categories",
+    "manquantes"
+   ],
+   "title": "Couverture",
+   "type": "object"
+  },
+  "Dossier": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "slot": {
+     "enum": [
+      1,
+      2,
+      3
+     ],
+     "title": "Slot",
+     "type": "integer"
+    },
+    "type": {
+     "enum": [
+      "urgence_data",
+      "institutionnel",
+      "ministeriel"
+     ],
+     "title": "Type",
+     "type": "string"
+    },
+    "famille_anomalie": {
+     "title": "Famille Anomalie",
+     "type": "string"
+    },
+    "ministere": {
+     "$ref": "#/$defs/Ministere"
+    },
+    "titre": {
+     "title": "Titre",
+     "type": "string"
+    },
+    "resume": {
+     "title": "Resume",
+     "type": "string"
+    },
+    "gravite": {
+     "maximum": 5,
+     "minimum": 1,
+     "title": "Gravite",
+     "type": "integer"
+    },
+    "indicateurs": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Indicateurs",
+     "type": "array"
+    },
+    "faits": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "Seuls nombres autorisés dans la narration",
+     "title": "Faits",
+     "type": "object"
+    },
+    "hausse_gravite_inaction": {
+     "description": "+0,15 = +15 % de gravité par tour d'inaction",
+     "title": "Hausse Gravite Inaction",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "slot",
+    "type",
+    "famille_anomalie",
+    "ministere",
+    "titre",
+    "resume",
+    "gravite",
+    "indicateurs",
+    "faits",
+    "hausse_gravite_inaction"
+   ],
+   "title": "Dossier",
+   "type": "object"
+  },
+  "EstimationCabinet": {
+   "additionalProperties": false,
+   "properties": {
+    "valeur": {
+     "title": "Valeur",
+     "type": "number"
+    },
+    "bas": {
+     "title": "Bas",
+     "type": "number"
+    },
+    "haut": {
+     "title": "Haut",
+     "type": "number"
+    },
+    "methode": {
+     "enum": [
+      "persistance_amortie",
+      "persistance"
+     ],
+     "title": "Methode",
+     "type": "string"
+    },
+    "periodes_ecoulees": {
+     "title": "Periodes Ecoulees",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "valeur",
+    "bas",
+    "haut",
+    "methode",
+    "periodes_ecoulees"
+   ],
+   "title": "EstimationCabinet",
+   "type": "object"
+  },
+  "Groupe": {
+   "additionalProperties": false,
+   "properties": {
+    "code": {
+     "title": "Code",
+     "type": "string"
+    },
+    "libelle": {
+     "title": "Libelle",
+     "type": "string"
+    },
+    "sieges": {
+     "minimum": 0,
+     "title": "Sieges",
+     "type": "integer"
+    },
+    "cohesion_30j": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "Part moyenne des votants du groupe alignés sur sa position majoritaire, 0-1",
+     "title": "Cohesion 30J"
+    },
+    "scrutins_30j": {
+     "minimum": 0,
+     "title": "Scrutins 30J",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "code",
+    "libelle",
+    "sieges",
+    "cohesion_30j",
+    "scrutins_30j"
+   ],
+   "title": "Groupe",
+   "type": "object"
+  },
+  "IndicateurBilan": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "ministere": {
+     "$ref": "#/$defs/Ministere"
+    },
+    "sous_categorie": {
+     "title": "Sous Categorie",
+     "type": "string"
+    },
+    "libelle": {
+     "title": "Libelle",
+     "type": "string"
+    },
+    "unite": {
+     "title": "Unite",
+     "type": "string"
+    },
+    "cadence": {
+     "enum": [
+      "mensuelle",
+      "trimestrielle",
+      "annuelle"
+     ],
+     "title": "Cadence",
+     "type": "string"
+    },
+    "source": {
+     "$ref": "#/$defs/Source"
+    },
+    "statut_source": {
+     "$ref": "#/$defs/StatutSource"
+    },
+    "derniere": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Publication"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "precedente": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Publication"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "prochaine": {
+     "$ref": "#/$defs/ProchainePublication"
+    },
+    "estimation_cabinet": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/EstimationCabinet"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "libelle_brouillard": {
+     "description": "Ex. « Donnée T3 2026 — prochaine publication estimée en février 2027 »",
+     "title": "Libelle Brouillard",
+     "type": "string"
+    },
+    "serie": {
+     "items": {
+      "$ref": "#/$defs/Point"
+     },
+     "maxItems": 60,
+     "title": "Serie",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "ministere",
+    "sous_categorie",
+    "libelle",
+    "unite",
+    "cadence",
+    "source",
+    "statut_source",
+    "derniere",
+    "precedente",
+    "prochaine",
+    "estimation_cabinet",
+    "libelle_brouillard",
+    "serie"
+   ],
+   "title": "IndicateurBilan",
+   "type": "object"
+  },
+  "IndicateurPilotage": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "famille_anomalie": {
+     "description": "Famille pour le quota de diversité du Slot 1 (ex. energie, meteo, eau)",
+     "title": "Famille Anomalie",
+     "type": "string"
+    },
+    "ministere": {
+     "$ref": "#/$defs/Ministere"
+    },
+    "sous_categorie": {
+     "title": "Sous Categorie",
+     "type": "string"
+    },
+    "libelle": {
+     "title": "Libelle",
+     "type": "string"
+    },
+    "unite": {
+     "title": "Unite",
+     "type": "string"
+    },
+    "cadence": {
+     "enum": [
+      "quotidienne",
+      "hebdomadaire"
+     ],
+     "title": "Cadence",
+     "type": "string"
+    },
+    "source": {
+     "$ref": "#/$defs/Source"
+    },
+    "statut_source": {
+     "$ref": "#/$defs/StatutSource"
+    },
+    "derniere_date": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Derniere Date"
+    },
+    "derniere_valeur": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Derniere Valeur"
+    },
+    "serie": {
+     "items": {
+      "$ref": "#/$defs/Point"
+     },
+     "maxItems": 120,
+     "title": "Serie",
+     "type": "array"
+    },
+    "anomalie": {
+     "$ref": "#/$defs/Anomalie"
+    },
+    "composantes": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "Détail chiffré du dernier point (ex. ruptures, tensions)",
+     "title": "Composantes",
+     "type": "object"
+    },
+    "notes": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Notes",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "famille_anomalie",
+    "ministere",
+    "sous_categorie",
+    "libelle",
+    "unite",
+    "cadence",
+    "source",
+    "statut_source",
+    "derniere_date",
+    "derniere_valeur",
+    "serie",
+    "anomalie",
+    "composantes",
+    "notes"
+   ],
+   "title": "IndicateurPilotage",
+   "type": "object"
+  },
+  "Jeton": {
+   "additionalProperties": false,
+   "properties": {
+    "nom": {
+     "title": "Nom",
+     "type": "string"
+    },
+    "usage": {
+     "title": "Usage",
+     "type": "string"
+    },
+    "configure": {
+     "title": "Configure",
+     "type": "boolean"
+    },
+    "expire_le": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Expire Le"
+    },
+    "jours_restants": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Jours Restants"
+    },
+    "alerte_j30": {
+     "title": "Alerte J30",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "nom",
+    "usage",
+    "configure",
+    "expire_le",
+    "jours_restants",
+    "alerte_j30"
+   ],
+   "title": "Jeton",
+   "type": "object"
+  },
+  "Meta": {
+   "additionalProperties": false,
+   "properties": {
+    "generated_at": {
+     "description": "Horodatage UTC ISO 8601",
+     "title": "Generated At",
+     "type": "string"
+    },
+    "date_jeu": {
+     "description": "Date du jour à Paris",
+     "title": "Date Jeu",
+     "type": "string"
+    },
+    "mode": {
+     "enum": [
+      "quotidien",
+      "horaire"
+     ],
+     "title": "Mode",
+     "type": "string"
+    },
+    "revision": {
+     "description": "0 au lot de 09h15, +1 à chaque révision horaire du même jour",
+     "minimum": 0,
+     "title": "Revision",
+     "type": "integer"
+    },
+    "pipeline_version": {
+     "title": "Pipeline Version",
+     "type": "string"
+    },
+    "duree_s": {
+     "title": "Duree S",
+     "type": "number"
+    },
+    "couverture": {
+     "$ref": "#/$defs/Couverture"
+    },
+    "alertes": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Alertes",
+     "type": "array"
+    }
+   },
+   "required": [
+    "generated_at",
+    "date_jeu",
+    "mode",
+    "revision",
+    "pipeline_version",
+    "duree_s",
+    "couverture",
+    "alertes"
+   ],
+   "title": "Meta",
+   "type": "object"
+  },
+  "Ministere": {
+   "enum": [
+    "economie_finances",
+    "travail_solidarites",
+    "sante",
+    "ecologie_energie",
+    "transports_logement",
+    "interieur",
+    "justice",
+    "education_esr",
+    "agriculture",
+    "armees",
+    "europe_affaires_etrangeres",
+    "culture_sports",
+    "transversal"
+   ],
+   "title": "Ministere",
+   "type": "string"
+  },
+  "Note": {
+   "additionalProperties": false,
+   "properties": {
+    "auteur": {
+     "enum": [
+      "bercy",
+      "social"
+     ],
+     "title": "Auteur",
+     "type": "string"
+    },
+    "titre": {
+     "title": "Titre",
+     "type": "string"
+    },
+    "texte": {
+     "title": "Texte",
+     "type": "string"
+    },
+    "mode": {
+     "enum": [
+      "llm",
+      "gabarit"
+     ],
+     "title": "Mode",
+     "type": "string"
+    },
+    "modele": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Modele"
+    },
+    "rejets": {
+     "description": "Motifs de rejet des sorties LLM écartées",
+     "items": {
+      "type": "string"
+     },
+     "title": "Rejets",
+     "type": "array"
+    }
+   },
+   "required": [
+    "auteur",
+    "titre",
+    "texte",
+    "mode",
+    "modele",
+    "rejets"
+   ],
+   "title": "Note",
+   "type": "object"
+  },
+  "Parlement": {
+   "additionalProperties": false,
+   "properties": {
+    "an": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Chambre"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "senat": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Chambre"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "required": [
+    "an",
+    "senat"
+   ],
+   "title": "Parlement",
+   "type": "object"
+  },
+  "Point": {
+   "additionalProperties": false,
+   "properties": {
+    "d": {
+     "description": "Premier jour de la période, AAAA-MM-JJ",
+     "title": "D",
+     "type": "string"
+    },
+    "v": {
+     "title": "V",
+     "type": "number"
+    }
+   },
+   "required": [
+    "d",
+    "v"
+   ],
+   "title": "Point",
+   "type": "object"
+  },
+  "ProchainePublication": {
+   "additionalProperties": false,
+   "properties": {
+    "date": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Date"
+    },
+    "estimee": {
+     "description": "True si déduite de la cadence, faute de calendrier officiel lu",
+     "title": "Estimee",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "date",
+    "estimee"
+   ],
+   "title": "ProchainePublication",
+   "type": "object"
+  },
+  "Publication": {
+   "additionalProperties": false,
+   "properties": {
+    "periode": {
+     "description": "Libellé de période : 2026-10, 2026-T3, 2026",
+     "title": "Periode",
+     "type": "string"
+    },
+    "d": {
+     "title": "D",
+     "type": "string"
+    },
+    "valeur": {
+     "title": "Valeur",
+     "type": "number"
+    },
+    "publiee_le": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "description": "Date de mise à jour déclarée par le producteur",
+     "title": "Publiee Le"
+    }
+   },
+   "required": [
+    "periode",
+    "d",
+    "valeur",
+    "publiee_le"
+   ],
+   "title": "Publication",
+   "type": "object"
+  },
+  "SanteSource": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "libelle": {
+     "title": "Libelle",
+     "type": "string"
+    },
+    "statut": {
+     "$ref": "#/$defs/StatutSource"
+    },
+    "http": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Http"
+    },
+    "derniere_donnee": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Derniere Donnee"
+    },
+    "age_jours": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Age Jours"
+    },
+    "tolerance_jours": {
+     "title": "Tolerance Jours",
+     "type": "integer"
+    },
+    "echecs_consecutifs": {
+     "title": "Echecs Consecutifs",
+     "type": "integer"
+    },
+    "verifie_le": {
+     "title": "Verifie Le",
+     "type": "string"
+    },
+    "info": {
+     "title": "Info",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "libelle",
+    "statut",
+    "http",
+    "derniere_donnee",
+    "age_jours",
+    "tolerance_jours",
+    "echecs_consecutifs",
+    "verifie_le",
+    "info"
+   ],
+   "title": "SanteSource",
+   "type": "object"
+  },
+  "Source": {
+   "additionalProperties": false,
+   "properties": {
+    "producteur": {
+     "title": "Producteur",
+     "type": "string"
+    },
+    "jeu": {
+     "description": "Identifiant du jeu : dataset ODS, IDBANK, slug data.gouv, URL de fichier",
+     "title": "Jeu",
+     "type": "string"
+    },
+    "url": {
+     "title": "Url",
+     "type": "string"
+    },
+    "licence": {
+     "title": "Licence",
+     "type": "string"
+    },
+    "officiel": {
+     "description": "False pour les sources tierces (Indeed, Lampions) : afficher « non officiel »",
+     "title": "Officiel",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "producteur",
+    "jeu",
+    "url",
+    "licence",
+    "officiel"
+   ],
+   "title": "Source",
+   "type": "object"
+  },
+  "StatutSource": {
+   "enum": [
+    "vivante",
+    "en_retard",
+    "morte"
+   ],
+   "title": "StatutSource",
+   "type": "string"
+  },
+  "Substitution": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "libelle": {
+     "title": "Libelle",
+     "type": "string"
+    },
+    "valeur": {
+     "title": "Valeur",
+     "type": "number"
+    },
+    "unite": {
+     "title": "Unite",
+     "type": "string"
+    },
+    "reference": {
+     "description": "Date ou période de la valeur de référence",
+     "title": "Reference",
+     "type": "string"
+    },
+    "source_libelle": {
+     "title": "Source Libelle",
+     "type": "string"
+    },
+    "source_url": {
+     "title": "Source Url",
+     "type": "string"
+    },
+    "statut": {
+     "enum": [
+      "verifie",
+      "a_confirmer"
+     ],
+     "title": "Statut",
+     "type": "string"
+    },
+    "note": {
+     "title": "Note",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "libelle",
+    "valeur",
+    "unite",
+    "reference",
+    "source_libelle",
+    "source_url",
+    "statut",
+    "note"
+   ],
+   "title": "Substitution",
+   "type": "object"
+  },
+  "Tour1": {
+   "additionalProperties": false,
+   "properties": {
+    "date_jeu": {
+     "title": "Date Jeu",
+     "type": "string"
+    },
+    "jour_calme": {
+     "title": "Jour Calme",
+     "type": "boolean"
+    },
+    "dossiers": {
+     "items": {
+      "$ref": "#/$defs/Dossier"
+     },
+     "maxItems": 3,
+     "title": "Dossiers",
+     "type": "array"
+    },
+    "notes": {
+     "items": {
+      "$ref": "#/$defs/Note"
+     },
+     "maxItems": 2,
+     "title": "Notes",
+     "type": "array"
+    },
+    "une": {
+     "$ref": "#/$defs/Une"
+    }
+   },
+   "required": [
+    "date_jeu",
+    "jour_calme",
+    "dossiers",
+    "notes",
+    "une"
+   ],
+   "title": "Tour1",
+   "type": "object"
+  },
+  "Une": {
+   "additionalProperties": false,
+   "properties": {
+    "titre": {
+     "title": "Titre",
+     "type": "string"
+    },
+    "sous_titre": {
+     "title": "Sous Titre",
+     "type": "string"
+    },
+    "bandeau_20h": {
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 6,
+     "title": "Bandeau 20H",
+     "type": "array"
+    }
+   },
+   "required": [
+    "titre",
+    "sous_titre",
+    "bandeau_20h"
+   ],
+   "title": "Une",
+   "type": "object"
+  }
+ },
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
