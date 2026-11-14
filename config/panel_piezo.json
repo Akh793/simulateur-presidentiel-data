@@ -1,0 +1,18 @@
+{
+ "choisi_le": "2026-11-14",
+ "valide_jusqu_au": "2026-12-14",
+ "stations": {
+  "00665X0016/S1": "02 Bois-lès-Pargny",
+  "01194X0069/S1": "14 Bény-sur-Mer",
+  "06607X0024/F": "17 Villiers-Couture",
+  "04702X0019/SONDAG": "21 Spoy",
+  "10097X0224/F": "31 Le Fauga",
+  "08264X0004/F1": "33 Saint-Jean-d'Illac",
+  "05155X0002/FAEP": "37 Civray-sur-Esves",
+  "03282X0043/S1": "45 Engenville",
+  "01086X0011/LS4": "51 Bourgogne-Fresne",
+  "00146B0007/F1": "59 Lille",
+  "02713X0105/PZ1": "67 Gresswiller",
+  "05664X0048/P": "86 Lencloître"
+ }
+}
